@@ -23,7 +23,7 @@ class Addons
     public function __construct()
     {
         $this->path = base_path('addons');
-        $this->providersMapFile = base_path('addons/addons_service_provider.json');
+        $this->providersMapFile = base_path('addons/addons.json');
         $this->file = app()->make(Filesystem::class);
     }
 
