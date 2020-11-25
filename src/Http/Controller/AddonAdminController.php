@@ -18,6 +18,21 @@ class AddonAdminController extends Controller
         $this->getSidebarMenu();
     }
 
+    /**
+     * 获取组件名称
+     * @Author    王凯
+     * @DateTime  2020-11-23
+     * @copyright [copyright]
+     * @license   [license]
+     * @version   [version]
+     * @return    [type]
+     */
+    public function getAddonTitle() {
+
+        $config = json_decode(app()->make(Filesystem::class)->get(base_path('addons/' . ucwords($this->getAddonName())) . '/config.json'), true);
+
+        return $config['title'];
+    }
 
     /**
      * 获取组件名称
