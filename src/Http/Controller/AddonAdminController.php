@@ -14,6 +14,11 @@ class AddonAdminController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
+    public function __construct() {
+        $this->getSidebarMenu();
+    }
+
+
     /**
      * 获取组件名称
      * @Author    王凯
@@ -25,10 +30,10 @@ class AddonAdminController extends Controller
      */
     public function getAddonName() {
 
-    	$uris = explode('/addons/', request()->url())[1];
+        $uris = explode('/addons/', request()->url())[1];
 
-    	$addonName = ucwords(substr($uris, 0, strpos($uris, "/")));
-    	return $addonName;
+        $addonName = ucwords(substr($uris, 0, strpos($uris, "/")));
+        return $addonName;
     }
 
     /**
@@ -43,10 +48,22 @@ class AddonAdminController extends Controller
     public function getSidebarMenu() {
         
         $config = json_decode(app()->make(Filesystem::class)->get(base_path('addons/' . ucwords($this->getAddonName())) . '/config.json'), true);
-
+        
         admin_inject_section(Admin::SECTION['LEFT_SIDEBAR_MENU'], function () use ($config) {
+
             $builder = Admin::menu();
-            $html = '';
+            $adminUrl = admin_url('/');
+
+            $html = <<<EOD
+
+<li class="nav-item">
+    <a onclick="window.location.href='{$adminUrl}'" href="javascript:;" class="nav-link">
+        <i class="fa fa-angle-left"></i><p>返回控台</p>
+    </a>
+</li>
+
+EOD;
+
             foreach (Helper::buildNestedArray($config['menu']) as $item) {
                 $html .= view('admin::partials.menu', ['item' => $item, 'builder' => $builder])->render();
             }
