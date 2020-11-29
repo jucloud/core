@@ -1,20 +1,23 @@
 <?php
 namespace JuCloud\Core\Http\Controller;
 
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Routing\Controller;
+use Dcat\Admin\Http\Controllers\AdminController;
 use Illuminate\Http\Request;
 use Dcat\Admin\Support\Helper;
 use Dcat\Admin\Admin;
 
-class AddonAdminController extends Controller
+class AddonAdminController extends AdminController
 {
-    use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
     public function __construct() {
+        
+        $addonTitle = $this->getAddonTitle();
+
+        $this->description = [
+            'index'  => $addonTitle,
+            'edit'   => $addonTitle,
+        ];
+        
         $this->getSidebarMenu();
     }
 
@@ -28,6 +31,10 @@ class AddonAdminController extends Controller
      * @return    [type]
      */
     public function getAddonTitle() {
+
+        if(!$this->getAddonName()) {
+            return false;
+        }
 
         $config = json_decode(app()->make(Filesystem::class)->get(base_path('addons/' . ucwords($this->getAddonName())) . '/config.json'), true);
 
@@ -45,9 +52,13 @@ class AddonAdminController extends Controller
      */
     public function getAddonName() {
 
-        $uris = explode('/addons/', request()->url())[1];
+        $uris = explode('/addons/', request()->url());
 
-        $addonName = ucwords(substr($uris, 0, strpos($uris, "/")));
+        if(count($uris) < 2) {
+            return false;
+        }
+
+        $addonName = ucwords(substr($uris[1], 0, strpos($uris[1], "/")));
         return $addonName;
     }
 
@@ -61,6 +72,10 @@ class AddonAdminController extends Controller
      * @return    [type]
      */
     public function getSidebarMenu() {
+        
+        if(!$this->getAddonName()) {
+            return false;
+        }
         
         $config = json_decode(app()->make(Filesystem::class)->get(base_path('addons/' . ucwords($this->getAddonName())) . '/config.json'), true);
         
